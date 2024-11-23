@@ -1,8 +1,0 @@
-[mysqld]
-log-bin=mysql-bin
-server-id = 3307
-
-auto_increment_increment=2
-auto_increment_offset=2
-log-slave-updates
-sync_binlog=1
