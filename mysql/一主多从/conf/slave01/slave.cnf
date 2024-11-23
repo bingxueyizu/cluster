@@ -1,0 +1,9 @@
+[mysqld]
+# 指定服务id
+server-id = 3307
+
+# 配置节点普通用户只读
+read-only=on
+
+# 配置节点root只读-从节点会启动失败
+# super_read_only=on

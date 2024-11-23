@@ -1,0 +1,9 @@
+[mysqld]
+# 开始二进制日志
+log-bin=mysql-bin
+
+# 指定binglog的格式为mixed（混合模式），还支持STATEMENT (基于语句的复制)、ROW (基于行的复制--默认)
+binlog_format=mixed
+
+# 指定服务id
+server-id = 3306
