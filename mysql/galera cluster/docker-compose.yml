@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mariadb-init:
+    image: mariadb:11.6.2
+    container_name: mariadb-init
+    ports:
+      - "3306:3306"
+    environment:
+      - TIMEZONE=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - ./conf/mariadb-init:/etc/mysql/conf.d
+    command: ["--wsrep-new-cluster"]
+
+  mariadb-0:
+    image: mariadb:11.6.2
+    container_name: mariadb-0
+    ports:
+      - "3307:3306"
+    environment:
+      - TIMEZONE=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - ./conf/mariadb-0:/etc/mysql/conf.d
+    depends_on:
+      - mariadb-init
+
+  mariadb-1:
+    image: mariadb:11.6.2
+    container_name: mariadb-1
+    ports:
+      - "3308:3306"
+    environment:
+      - TIMEZONE=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - ./conf/mariadb-1:/etc/mysql/conf.d
+    depends_on:
+      - mariadb-init
+      - mariadb-0
+
+  mariadb-2:
+    image: mariadb:11.6.2
+    container_name: mariadb-2
+    ports:
+      - "3309:3306"
+    environment:
+      - TIMEZONE=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - ./conf/mariadb-2:/etc/mysql/conf.d
+    depends_on:
+      - mariadb-init
+      - mariadb-0
+      - mariadb-1
