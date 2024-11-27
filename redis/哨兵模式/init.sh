@@ -63,12 +63,19 @@ function slaveToMaster() {
         echo "❌ 主节点 $node 停止失败！"
     fi
 
-    sleep 10
-
+    # 检查节点是否升级成功
     node="redis-slave"
+    while true; do
+        ROLE=$(docker exec $node redis-cli -a ${REDIS_PASSWORD} -c info Replication | grep role)
+        echo $ROLE
+        if [[ "$ROLE" == *"role:master"* ]]; then
+            break
+        fi
+        sleep 1
+    done
+
     echo "🔍 从节点 $node 写入数据："
     docker exec $node redis-cli -a ${REDIS_PASSWORD} -c set slave 123
-    # docker exec redis-slave redis-cli -a 123 -c set slave 123
     docker exec $node redis-cli -a ${REDIS_PASSWORD} -c get slave
     if [[ $? -eq 0 ]]; then
         echo "✅ 从节点 $node 升级成功！"
