@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  redis-master:
+    image: redis:7.4.0
+    container_name: redis-master
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./conf/master/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+
+  redis-slave:
+    image: redis:7.4.0
+    container_name: redis-slave
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./conf/slave/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+
+  redis-sentinel-0:
+    image: redis:7.4.0
+    container_name: redis-sentinel-0
+    ports:
+      - "16380:16379"
+    volumes:
+      - ./conf/sentinel-0/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+    depends_on: ["redis-master"]
+
+  redis-sentinel-1:
+    image: redis:7.4.0
+    container_name: redis-sentinel-1
+    ports:
+      - "26380:16379"
+    volumes:
+      - ./conf/sentinel-1/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+    depends_on: ["redis-master"]
+
+  redis-sentinel-2:
+    image: redis:7.4.0
+    container_name: redis-sentinel-2
+    ports:
+      - "36380:16379"
+    volumes:
+      - ./conf/sentinel-2/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+    depends_on: ["redis-master"]
