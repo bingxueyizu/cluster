@@ -1,0 +1,68 @@
+
+version: '3'
+services:
+  redis-master-0:
+    image: redis:7.4.0
+    container_name: redis-master-0
+    ports:
+      - "6379:6379"
+      - "16379:16379"
+    volumes:
+      - ./conf/master-0:/data
+    restart: always
+    command: redis-server /data/redis.conf
+
+  redis-slave-0:
+    image: redis:7.4.0
+    container_name: redis-slave-0
+    ports:
+      - "6479:6379"
+      - "16479:16379"
+    volumes:
+      - ./conf/slave-0:/data
+    restart: always
+    command: redis-server /data/redis.conf
+
+  redis-master-1:
+    image: redis:7.4.0
+    container_name: redis-master-1
+    ports:
+      - "6579:6379"
+      - "16579:16379"
+    volumes:
+      - ./conf/master-1:/data
+    restart: always
+    command: redis-server /data/redis.conf
+
+  redis-slave-1:
+    image: redis:7.4.0
+    container_name: redis-slave-1
+    ports:
+      - "6679:6379"
+      - "16679:16379"
+    volumes:
+      - ./conf/slave-1:/data
+    restart: always
+    command: redis-server /data/redis.conf
+
+  redis-master-2:
+    image: redis:7.4.0
+    container_name: redis-master-2
+    ports:
+      - "6779:6379"
+      - "16779:16379"
+    volumes:
+      - ./conf/master-2:/data
+    restart: always
+    command: redis-server /data/redis.conf
+
+  redis-slave-2:
+    image: redis:7.4.0
+    container_name: redis-slave-2
+    ports:
+      - "6879:6379"
+      - "16879:16379"
+    volumes:
+      - ./conf/slave-2:/data
+    restart: always
+    command: redis-server /data/redis.conf
