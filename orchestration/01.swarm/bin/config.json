@@ -1,0 +1,21 @@
+{
+    "VM": {
+        "desc": "配置虚拟机，删除虚拟机后，会到配置地址目录下删除文件夹",
+        "VM_DIR": "/data/VirtualBox VMs",
+        "VM_GROUP": "/swarm-cluster"
+    },
+    "system": {
+        "password": "yidaoliu",
+        "memory_m": "2048",
+        "cpus": "1"
+    },
+    "network": {
+        "bridge": "enp3s0",
+        "gateway": "192.168.15.52",
+        "dns": "192.168.10.8"
+    },
+    "disks_m": {
+        "desc": "扩展磁盘列表，定义每一块磁盘的大小",
+        "volumes": "10240,10240,10240"
+    }
+}
