@@ -1,0 +1,125 @@
+- name: 替换 CentOS 源并更新 YUM 缓存
+  block:
+    - name: 备份原 CentOS 源
+      command: mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+      ignore_errors: yes
+
+    - name: 复制阿里云 CentOS 源
+      copy:
+        src: "{{ aliyun_centos_repo }}"
+        dest: /etc/yum.repos.d/CentOS-Base.repo
+        owner: root
+        group: root
+        mode: "0644"
+        
+    - name: 清理并更新 YUM 缓存
+      shell: |
+        yum clean all
+        yum makecache fast
+
+  # 如果你需要添加某些控制块，例如当失败时继续执行
+  ignore_errors: yes
+  # 跳过任务
+  # when: false
+
+- name: 安装其他依赖包
+  package:
+    name:
+      - jq
+      - tree
+    state: present
+
+- name: 安装 Docker 和 Docker Compose
+  block:
+    - name: 安装 Docker 依赖包
+      yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+
+    - name: 添加 Docker 官方仓库
+      command: yum-config-manager --add-repo {{ docker_repo_url }}
+
+    - name: 安装 Docker CE
+      yum:
+        name: docker-ce
+        state: present
+
+    - name: 配置 Docker Daemon
+      copy:
+        src: "{{ docker_daemon_src }}"
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - 重启 Docker 服务
+
+    - name: 获取最新的 Docker Compose 版本
+      shell: |
+        curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name
+      register: docker_compose_version
+
+    - name: 下载并安装 Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version.stdout }}/docker-compose-{{ ansible_facts['system'] | lower }}-{{ ansible_facts['architecture'] }}"
+        dest: /usr/local/bin/docker-compose
+        mode: "0755"
+
+    - name: 创建 Docker Compose 符号链接
+      command: ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
+      ignore_errors: yes
+
+- name: 安装 local-persist 插件
+  block:
+    - name: 获取最新的 local-persist 版本
+      shell: |
+        curl -s https://api.github.com/repos/MatchbookLab/local-persist/releases/latest | jq -r .tag_name
+      register: local_persist_version
+
+    - name: 下载并安装 local-persist 插件 和 local-persist systemd 服务文件
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - {
+            url: "https://github.com/MatchbookLab/local-persist/releases/download/{{ local_persist_version.stdout }}/local-persist-linux-amd64",
+            dest: "/usr/bin/docker-volume-local-persist",
+            mode: "0755",
+          }
+        - {
+            url: "https://raw.githubusercontent.com/MatchbookLab/local-persist/master/init/systemd.service",
+            dest: "/etc/systemd/system/docker-volume-local-persist.service",
+            mode: "0644",
+          }
+
+    - name: 重新加载 systemd 并启用服务
+      systemd:
+        name: docker-volume-local-persist
+        state: started
+        enabled: yes
+
+    - name: 激活 local-persist 插件并删除初始化的临时 volume
+      block:
+        - command: docker volume create -d local-persist -o mountpoint=/tmp/images --name=tmp-init-local-persist-plugin
+        - command: docker volume rm tmp-init-local-persist-plugin
+
+- name: 验证 Docker 环境
+  block:
+    - name: 输出 Docker 和 Docker Compose 版本
+      shell: |
+        docker --version
+        /usr/local/bin/docker-compose --version
+        docker info | grep Volume
+      register: version_output
+      changed_when: false
+
+    - name: 显示版本信息
+      debug:
+        msg: |
+          Docker version: {{ version_output.stdout_lines[0] }}
+          Docker Compose version: {{ version_output.stdout_lines[1] }}
+          Docker Volume: {{ version_output.stdout_lines[2] }}

@@ -5,9 +5,8 @@
         "VM_GROUP": "/swarm-cluster"
     },
     "system": {
-        "password": "yidaoliu",
-        "memory_m": "2048",
-        "cpus": "1"
+        "memory_m": "4096",
+        "cpus": "2"
     },
     "network": {
         "bridge": "enp3s0",

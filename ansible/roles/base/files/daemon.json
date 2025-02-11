@@ -1,0 +1,10 @@
+{
+  "registry-mirrors": [
+    "http://docker.devops.tr"
+  ],
+  "insecure-registries": [
+    "docker.devops.tr"
+  ],
+  "metrics-addr": "127.0.0.1:9323",
+  "experimental": true
+}

@@ -1,0 +1,9 @@
+---
+# vars file for base
+
+# CentOS 源配置
+aliyun_centos_repo: Centos-7.repo
+
+# Docker 配置
+docker_repo_url: "http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
+docker_daemon_src: daemon.json

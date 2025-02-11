@@ -1,4 +1,8 @@
 [swarm-master]
-swarm-1 ansible_host=192.168.15.111 ansible_user=root
-swarm-2 ansible_host=192.168.15.112 ansible_user=root
-swarm-3 ansible_host=192.168.15.113 ansible_user=root
+swarm-1 ansible_host=192.168.15.111
+swarm-2 ansible_host=192.168.15.112
+swarm-3 ansible_host=192.168.15.113
+
+[swarm-master:vars]
+ansible_user=root
+ansible_password=yidaoliu
